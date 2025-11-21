@@ -6,7 +6,7 @@ from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 
 
-def test_add_single_product_to_cart(driver):
+def test_add_product_to_cart(driver):
     login_page = LoginPage(driver)
     inventory_page = InventoryPage(driver)
 
@@ -19,5 +19,6 @@ def test_add_single_product_to_cart(driver):
 
     cart_count = inventory_page.get_cart_badge_count()
 
-    assert cart_count == 2, f"Se esperaban 6 productos en el carrito, pero se encontraron {cart_count}"
+    inventory_page.go_to_cart()
     time.sleep(2)
+    assert cart_count == 2, f"Se esperaban 2 productos en el carrito, pero se encontraron {cart_count}"    
