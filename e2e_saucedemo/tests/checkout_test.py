@@ -1,6 +1,8 @@
 import time
 import pytest
 from selenium.webdriver.support.ui import WebDriverWait
+import os
+from datetime import datetime
 
 from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
@@ -8,6 +10,15 @@ from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
 from pages.confirmation_page import ConfirmationPage
 
+def tomar_evidencia(driver, nombre_paso):
+    carpeta = "evidencias"
+    if not os.path.exists(carpeta):
+        os.makedirs(carpeta)
+    
+    timestamp = datetime.now().strftime("%H%M%S")
+    nombre_archivo = f"{carpeta}/{nombre_paso}_{timestamp}.png"
+    driver.save_screenshot(nombre_archivo)
+    print(f"FOTO GUARDADA: {nombre_archivo}")
 
 def test_complete_checkout_flow(driver):
     login_page = LoginPage(driver)
@@ -20,9 +31,11 @@ def test_complete_checkout_flow(driver):
     login_page.login("standard_user", "secret_sauce")
 
     inventory_page.add_product_to_cart("Sauce Labs Backpack")
+    tomar_evidencia(driver, "02_Productos_Agregados")
 
     inventory_page.go_to_cart()
     assert cart_page.is_cart_page()
+    tomar_evidencia(driver, "03_Carrito_Visualizacion")
 
     cart_page.go_to_checkout()
 
@@ -32,7 +45,9 @@ def test_complete_checkout_flow(driver):
         postal_code="170123",
     )
     checkout_page.continue_to_overview()
+    tomar_evidencia(driver, "04_Checkout_Overview")
 
     confirmation_page.finish_purchase()
     time.sleep(5)
     assert confirmation_page.is_order_complete()
+    tomar_evidencia(driver, "05_Confirmacion_Final")
